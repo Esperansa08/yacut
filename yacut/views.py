@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template
 
 from . import app, db
 from .forms import URLMapForm
@@ -11,21 +11,15 @@ def index_view():
     form = URLMapForm()
     if form.validate_on_submit():
         original = form.original_link.data
-        if URLMap.query.filter_by(original=original).first():
-            flash('Такая ссылка уже занята!')
-            return redirect(url_for('index_view'))
-        if form.custom_id.data:
-            custom_id = form.custom_id.data
-            if URLMap.query.filter_by(short=custom_id).first():
-                form.custom_id.errors = [f'Имя {custom_id} уже занято!']
-                render_template('index.html', form=form)
-            if special_match(custom_id):
-                flash('Hедопустимое именя для короткой ссылки')
-                render_template('index.html', form=form)
-        else:
+        custom_id = form.custom_id.data
+        if custom_id is None or len(custom_id) == 0:
             custom_id = get_unique_short_id()
-            if URLMap.query.filter_by(short=custom_id).first():
-                custom_id = get_unique_short_id()
+        elif URLMap.query.filter_by(short=custom_id).first():
+            flash(f'Имя {custom_id} уже занято!')
+            return render_template('index.html', form=form)
+        elif special_match(custom_id):
+            flash('Hедопустимое именя для короткой ссылки')
+            return render_template('index.html', form=form)
         urlmap = URLMap(
             original=original,
             short=custom_id)
@@ -35,7 +29,7 @@ def index_view():
     return render_template('index.html', form=form)
 
 
-@app.route('/<path:short>')
+@app.route('/<string:short>', methods=['GET'])
 def redirect_view(short):
     return redirect(
         URLMap.query.filter_by(short=short).first_or_404().original)

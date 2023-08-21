@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from flask import url_for
+
 from yacut import db
 from settings import MAX_CUSTOM_LENGTH
 
@@ -12,10 +14,10 @@ class URLMap(db.Model):
 
     def to_dict(self):
         return dict(
-            id=self.id,
             url=self.original,
-            custom_id=self.short,
-            timestamp=self.timestamp)
+            short_link=url_for('redirect_view',
+                               short=self.short,
+                               _external=True))
 
     def from_dict(self, data):
         setattr(self, 'original', data['url'])
