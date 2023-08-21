@@ -6,7 +6,7 @@ from . import app, db
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 from .utils import special_match, get_unique_short_id
-from settings import MAX_CUSTOM_LENGTH
+from settings import MAX_LENGTH_SHORT
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -22,7 +22,7 @@ def add_short_id():
     short = data['custom_id']
     if original is None:
         raise InvalidAPIUsage('Обязательные поле не может быть пустым')
-    if len(short) > MAX_CUSTOM_LENGTH or special_match(short):
+    if len(short) > MAX_LENGTH_SHORT or special_match(short):
         raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки')
     if URLMap.query.filter_by(short=short).first():
         raise InvalidAPIUsage(f'Имя "{short}" уже занято.')
@@ -38,4 +38,4 @@ def add_original(short_id):
     url = URLMap.query.filter_by(short=short_id).first()
     if not url:
         raise InvalidAPIUsage('Указанный id не найден', HTTPStatus.NOT_FOUND)
-    return jsonify({"url": url.original})
+    return jsonify({'url': url.original})

@@ -17,7 +17,7 @@ def index_view():
         elif URLMap.query.filter_by(short=custom_id).first():
             flash(f'Имя {custom_id} уже занято!')
             return render_template('index.html', form=form)
-        elif special_match(custom_id):
+        if special_match(custom_id):
             flash('Hедопустимое именя для короткой ссылки')
             return render_template('index.html', form=form)
         urlmap = URLMap(

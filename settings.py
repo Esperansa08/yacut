@@ -1,8 +1,10 @@
 import os
 import string
 
-MAX_LENGTH = 6
-MAX_CUSTOM_LENGTH = 16
+MIN_LENGTH = 1
+MAX_LENGTH_GEN = 6
+MAX_LENGTH_SHORT = 16
+MAX_LENGTH_LONG = 256
 SYMBOLS_URL = string.ascii_letters + string.digits
 
 
